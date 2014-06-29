@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <title>Test</title>
+
+  <script type='text/javascript' src='vector-matrix.js'></script>
+
+<script type='text/javascript'>
+
+    //  Must be initialized in/after onLoad.
+
+    function print_out(text) {
+        out.innerHTML += '<br>' + text;
+    }
+
+
+//  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    var compare_vector = function (what_is_tested, vector_is, vector_expected) {
+
+    //
+    //      Compare a vector (vector_is) with an expected
+    //      vector.
+    //
+
+        var passed = 1;
+        var table  = "<b>" + what_is_tested +"</b><table>";
+
+        var test_elem = function(elem_name) {
+            var td;
+
+            if (vector_is[elem_name] != vector_expected[elem_name]) {
+                passed = 0;
+                td = "<td style='width:6em'><span style='color:red'>" + vector_is[elem_name] + "</span> / " + vector_expected[elem_name] + "</td>";
+            }
+            else {
+
+                td = "<td style='width:6em'>" + vector_is[elem_name] + "</td>";
+
+            }
+
+            table += td;
+
+        }
+
+        test_elem('x');
+        test_elem('y');
+        test_elem('z');
+        test_elem('w');
+
+        if (!passed) {
+          alert ('! passed' + table);
+          print_out(table);
+        }
+
+    }
+
+    var compare_matrix = function (what_is_tested, matrix_is, matrix_expected) {
+
+    //
+    //      Compare a matrix (matrix_is) with an expected
+    //      matrix.
+    //
+
+        var passed = 1;
+        var table  = "<b>" + what_is_tested +"</b><table>";
+
+        var test_elem = function(elem_name) {
+
+            var td;
+
+            if (matrix_is[elem_name] != matrix_expected[elem_name]) {
+                passed = 0;
+                td = "<td style='width:6em'><span style='color:red'>" + matrix_is[elem_name] + "</span> / " + matrix_expected[elem_name] + "</td>";
+            }
+            else {
+
+                td = "<td style='width:6em'>" + matrix_is[elem_name] + "</td>";
+
+            }
+
+            table += td;
+        }
+
+
+        table += "<tr>";
+
+
+        test_elem('m_0_0'); test_elem('m_1_0'); test_elem('m_2_0'); test_elem('m_3_0'); table += "</tr><tr>";
+        test_elem('m_0_1'); test_elem('m_1_1'); test_elem('m_2_1'); test_elem('m_3_1'); table += "</tr><tr>";
+        test_elem('m_0_2'); test_elem('m_1_2'); test_elem('m_2_2'); test_elem('m_3_2'); table += "</tr><tr>";
+        test_elem('m_0_3'); test_elem('m_1_3'); test_elem('m_2_3'); test_elem('m_3_3'); table += "</tr></table>";
+
+
+
+        if (!passed) {
+          print_out(table);
+        }
+    }
+
+    var test_it = function() {
+
+
+        var pt_1_2_3 = new tq84.vector(1,2,3);
+
+        var scale_3  = tq84.scale(3);
+
+        compare_matrix('scale_3',
+                       scale_3, new tq84.matrix(  3,  0,  0,  0,
+                                                  0,  3,  0,  0,
+                                                  0,  0,  3,  0,
+                                                  0,  0,  0,  1) );
+
+        var pt_1_2_3_X_scale_3 = pt_1_2_3.mult(scale_3);
+
+        compare_vector('pt_1_2_3.mult(scale_3)', pt_1_2_3_X_scale_3, new tq84.vector(3,6,9));
+
+    //  Multiplying a vector with a matrix should not change the vector
+        compare_vector('pt_1_2_3', pt_1_2_3, new tq84.vector(1,2,3));
+
+
+        var scale_9 = scale_3.mult(scale_3);
+
+        compare_matrix('scale_3 * scale_3',
+                       scale_9, new tq84.matrix(  9,  0,  0,  0,
+                                                  0,  9,  0,  0,
+                                                  0,  0,  9,  0,
+                                                  0,  0,  0,  1) );
+
+    //  Multiplying a matrix with another matrix should not change the matrix:
+        compare_matrix('scale_3',
+                       scale_3, new tq84.matrix(  3,  0,  0,  0,
+                                                  0,  3,  0,  0,
+                                                  0,  0,  3,  0,
+                                                  0,  0,  0,  1) );
+
+
+        var translate_10_20_30 = tq84.translation(10,20,30);
+        compare_matrix('translate_10_20_30',
+                        translate_10_20_30, new tq84.matrix(  1,  0,  0, 10,
+                                                              0,  1,  0, 20,
+                                                              0,  0,  1, 30,
+                                                              0,  0,  0,  1));
+
+
+        var pt_translate = pt_1_2_3.mult(translate_10_20_30);
+        compare_vector('pt_translate', pt_translate, new tq84.vector(11,22,33));
+
+        var pt_screen = new tq84.vector(10, 10, 10);
+
+        var screen_xy = pt_screen.screen(30);
+
+        if (screen_xy.x != 7.5 ||
+            screen_xy.y != 7.5) {
+          print_out('<b>screen_xy</b>');
+        }
+
+
+        print_out('Done.');
+
+
+    }
+
+    function init() {
+      
+        out = document.getElementById('out');
+
+        try {
+           test_it();
+        }
+        catch (e) {
+          alert ('Exception: ' + e);
+        }
+
+
+    }
+
+ // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    
+
+</script>
+
+</head>
+
+<div id='out'></div>
+
+<body onLoad='init()'>
+
+</body>
+</html>
