@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <title>Grid</title>
+
+  <script type='text/javascript' src='vector-matrix.js'></script>
+  <script type='text/javascript'>
+
+    //  This is the matrix that is finally applied
+    //  in the draw-operations.
+    var finalMatrix;
+
+    var canvasContext;
+    var canvasElement;
+
+    var center_x;
+    var center_y;
+
+    function initCanvas() {
+
+        canvasElement = document.getElementById('canvas');
+        canvasContext = canvasElement.getContext('2d');
+
+        center_x = canvasElement.width  / 2;
+        center_y = canvasElement.height / 2;
+
+    }
+
+    function drawLine(vector_1, vector_2) {
+
+         var vector_1_ = vector_1.mult(finalMatrix);
+         var vector_2_ = vector_2.mult(finalMatrix);
+
+         var xy1 = vector_1_.screen(250);
+         var xy2 = vector_2_.screen(250);
+
+         canvasContext.beginPath();
+         canvasContext.moveTo(center_x + xy1.x, center_y - xy1.y);
+         canvasContext.lineTo(center_x + xy2.x, center_y - xy2.y);
+         canvasContext.stroke();
+    }
+
+    function drawGrid() {
+
+        for (var z = -5; z<=5; z++) {
+
+          var p1 = new tq84.vector(-250, 0, z*50);
+          var p2 = new tq84.vector(+250, 0, z*50);
+
+          drawLine(p1, p2);
+
+        }
+
+        for (var x = -5; x<=5; x++) {
+
+          var p1 = new tq84.vector(x*50, 0, -250);
+          var p2 = new tq84.vector(x*50, 0, +250);
+
+          drawLine(p1, p2);
+
+        }
+
+    }
+
+    function timer() { try {
+
+        if (typeof timer.counter == 'undefined') {
+        //
+        //  Static Variables in Javascript: http://stackoverflow.com/a/1535650/180275
+        // 
+            timer.counter = 0;
+        }
+
+        timer.counter ++; 
+
+        canvasContext.clearRect(0, 0, canvasElement.width, canvasElement.height );
+
+        var translation = tq84.translation(0, -100, 300)
+        var rotation    = tq84.rotation_y(timer.counter / 360 * Math.PI);
+
+        finalMatrix = translation.mult(rotation);
+
+        drawGrid();
+
+
+    } catch(e) { alert(e);}}
+
+    function init() { try {
+
+        initCanvas();
+
+        setInterval('timer()', 10);
+
+    } catch(e) {alert(e);}}
+
+  </script>
+
+</head>
+
+
+<body onload='init();'>
+
+      <canvas id    ='canvas' 
+                      width='900' height='600'
+              style ='border:solid 1px black;margin-left:-450px;margin-top:-300px;left:50%;position:fixed;top:50%'></canvas>
+
+</body>
+</html>
